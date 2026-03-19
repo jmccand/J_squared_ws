@@ -162,6 +162,10 @@ class TrackingNode(Node):
         # Now, the robot stops if the object is not detected
         # But, you may want to think about what to do in this case
         # and update the command velocity accordingly
+
+        # Thoughts:
+        # Spin in place if we don't see the goal?
+        # Start going around the obstacle?
         if self.goal_pose is None:
             cmd_vel = Twist()
             cmd_vel.linear.x = 0.0
@@ -184,6 +188,9 @@ class TrackingNode(Node):
         # feel free to modify the code structure, add more parameters, more input variables for the function, etc.
         
         ########### Write your code here ###########
+
+        # Thoughts:
+        # PID loops and Potential Fields
         
         # TODO: Update the control velocity command
         cmd_vel = Twist()
