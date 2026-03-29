@@ -60,12 +60,9 @@ class ColorObjDetectionNode(Node):
         self.get_logger().info('Color Object Detection Node Started')
         
         # Declare the parameters for the color detection
-        # self.declare_parameter('color_low', [110, 50, 150])
-        # self.declare_parameter('color_high', [130, 255, 255])
-        # self.declare_parameter('object_size_min', 100)
-        self.declare_parameter('color_low', [110, 50, 50])
+        self.declare_parameter('color_low', [110, 50, 150])
         self.declare_parameter('color_high', [130, 255, 255])
-        self.declare_parameter('object_size_min', 500)
+        self.declare_parameter('object_size_min', 1000)
         # Used to convert between ROS and OpenCV images
         self.br = CvBridge()
         
@@ -105,7 +102,7 @@ class ColorObjDetectionNode(Node):
             x, y, w, h = cv2.boundingRect(largest_contour)
             # threshold by size
             if w * h < param_object_size_min:
-                self.get_logger().info("Object too small")
+                self.get_logger().info("Size of detected object is too small: {}".format(w*h))
                 return
             # draw rectangle
             rgb_image=cv2.rectangle(rgb_image, (x, y), (x + w, y + h), (0, 0, 255), 2)

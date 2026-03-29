@@ -193,7 +193,10 @@ class TrackingNode(Node):
             return
         
         self.saw_goal = True
-        
+
+        if self.obs_pose is None:
+            return
+
         # Get the current object pose in the robot base_footprint frame
         current_obs_pose, current_goal_pose = self.get_current_poses()
         
