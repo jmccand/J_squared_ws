@@ -227,7 +227,7 @@ class TrackingNode(Node):
         obs_dist = np.linalg.norm(self.obs_pose)
 
         # Attractive field
-        U_att = xi*self.goal_pose
+        U_att = xi*-self.goal_pose
         
         # Repulsive field
         if obs_dist < Q_star:
@@ -236,14 +236,14 @@ class TrackingNode(Node):
             U_rep = np.array([0,0,0])
         
         # Turn towards goal
-        theta = kturn*self.goal_pose[1]/goal_dist
+        theta = 0.0 #kturn*self.goal_pose[1]/goal_dist
 
         self.get_logger().info('U_att: {}, U_rep: {}, theta: {}'.format(U_att, U_rep, theta))
 
 
         # TODO: Update the control velocity command
         cmd_vel = Twist()
-        cmd_vel.linear.x = U_att[0]# + U_rep[0]
+        cmd_vel.linear.x = U_att[0] + U_rep[0]
         cmd_vel.linear.y = U_att[1] + U_rep[1]
         cmd_vel.angular.z = theta
         return cmd_vel
