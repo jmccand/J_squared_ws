@@ -177,6 +177,13 @@ class TrackingNode(Node):
                 # if we've been spinning for a while and haven't seen
                 # the goal, we can assume it's behind the obstacle
                 self.pseudo_goal = True
+            if (self.get_clock().now() - self.spin_start_time).seconds() > 10:
+                # if we've been spinning for a long time and haven't seen
+                # the goal, we can assume it's not there and stop
+                self.pseudo_goal = False
+                cmd_vel = Twist()
+                self.pub_control_cmd.publish(cmd_vel)
+                return
             self.saw_goal = False
             cmd_vel = Twist()
             cmd_vel.angular.z = 0.5
