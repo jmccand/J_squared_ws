@@ -230,7 +230,7 @@ class TrackingNode(Node):
         obs_dist = np.linalg.norm(obs_pose)
 
         # Attractive field
-        U_att = xi * goal_pose
+        U_att = -xi * goal_pose
 
         # Repulsive field
         if obs_dist < Q_star:
