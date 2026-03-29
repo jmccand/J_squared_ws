@@ -238,8 +238,12 @@ class TrackingNode(Node):
         else:
             U_rep = np.array([0,0,0])
 
-        # Turn towards goal
-        theta = kturn*np.arctan2(goal_pose[1], goal_pose[0])
+        
+        theta_goal = np.arctan2(goal_pose[1], goal_pose[0])
+        theta_obs = np.arctan2(obs_pose[1], obs_pose[0])
+
+        # turn toward a weighted average of the goal and obstacle
+        theta = kturn*(theta_goal*goal_dist/(goal_dist+obs_dist) + theta_obs*obs_dist/(goal_dist+obs_dist))
 
         self.get_logger().info('U_att: {}, U_rep: {}, theta: {}'.format(U_att, U_rep, theta))
 
