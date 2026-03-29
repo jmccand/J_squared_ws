@@ -173,11 +173,11 @@ class TrackingNode(Node):
                 # we just saw the goal, but now we don't
                 # mark the time we started spinning to look for the goal
                 self.spin_start_time = self.get_clock().now()
-            if (self.get_clock().now() - self.spin_start_time).seconds() > 5:
+            if (self.get_clock().now() - self.spin_start_time).nanoseconds > 5*1e9:
                 # if we've been spinning for a while and haven't seen
                 # the goal, we can assume it's behind the obstacle
                 self.pseudo_goal = True
-            if (self.get_clock().now() - self.spin_start_time).seconds() > 10:
+            if (self.get_clock().now() - self.spin_start_time).nanoseconds > 10*1e9:
                 # if we've been spinning for a long time and haven't seen
                 # the goal, we can assume it's not there and stop
                 self.pseudo_goal = False
