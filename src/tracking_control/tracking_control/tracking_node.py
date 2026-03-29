@@ -211,11 +211,34 @@ class TrackingNode(Node):
         # Thoughts:
         # PID loops and Potential Fields
         
+        # Tuning variables
+        xi = 1;
+        eta = 1;
+        Q_star = 0.5;
+        kturn = 1;
+        
+        # Euclidean distances to goal, obs
+        goal_dist = np.linalg.norm(self.goal_pose)
+        obs_dist = np.linalg.norm(self.obs_pose)
+
+        # Attractive field
+        U_att = xi*self.goal_pose
+        
+        # Repulsive field
+        if obs_dist < Q_star:
+            U_rep = eta/2*(1/Q_star-1/obs_dist)/obs_dist^2)*self.obs_pose/obs_dist
+        else
+            U_rep = 0
+        
+        # Turn towards goal
+        theta = kturn*self.goal_pose(2)
+
+
         # TODO: Update the control velocity command
         cmd_vel = Twist()
-        cmd_vel.linear.x = 0
-        cmd_vel.linear.y = 0
-        cmd_vel.angular.z = 0
+        cmd_vel.linear.x = U_att(1) + U_rep(1)
+        cmd_vel.linear.y = U_att(2) + U_rep(2)
+        cmd_vel.angular.z = theta
         return cmd_vel
     
         ############################################
