@@ -223,7 +223,7 @@ class TrackingNode(Node):
         xi = 1;
         eta = 1;
         Q_star = 10;
-        kturn = 0.1;
+        kturn = 0.5;
 
         # Euclidean distances to goal, obs
         goal_dist = np.linalg.norm(goal_pose)
