@@ -60,9 +60,12 @@ class ColorObjDetectionNode(Node):
         self.get_logger().info('Color Object Detection Node Started')
         
         # Declare the parameters for the color detection
-        self.declare_parameter('color_low', [110, 50, 150])
+        # self.declare_parameter('color_low', [110, 50, 150])
+        # self.declare_parameter('color_high', [130, 255, 255])
+        # self.declare_parameter('object_size_min', 100)
+        self.declare_parameter('color_low', [110, 50, 50])
         self.declare_parameter('color_high', [130, 255, 255])
-        self.declare_parameter('object_size_min', 1000)
+        self.declare_parameter('object_size_min', 500)
         # Used to convert between ROS and OpenCV images
         self.br = CvBridge()
         
@@ -139,7 +142,7 @@ class ColorObjDetectionNode(Node):
         # publush the detected object image
         detect_img_msg = self.br.cv2_to_imgmsg(rgb_image, encoding='bgr8')
         detect_img_msg.header = rgb_msg.header
-        self.get_logger().info('image message published')
+        # self.get_logger().info('image message published')
         self.pub_detected_obj.publish(detect_img_msg)
         
 def main(args=None):

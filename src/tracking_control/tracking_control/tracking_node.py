@@ -168,6 +168,8 @@ class TrackingNode(Node):
         # and update the command velocity accordingly
 
         # Thoughts:
+        # log goal pose
+        # self.get_logger().info('Goal Pose: {}'.format(self.goal_pose))
         if self.goal_pose is None:
             if self.saw_goal:
                 # we just saw the goal, but now we don't
@@ -233,12 +235,14 @@ class TrackingNode(Node):
         # Turn towards goal
         theta = kturn*self.goal_pose[1]/goal_dist
 
+        self.get_logger().info('U_att: {}, U_rep: {}, theta: {}'.format(U_att, U_rep, theta))
+
 
         # TODO: Update the control velocity command
         cmd_vel = Twist()
-        cmd_vel.linear.x = U_att[0] + U_rep[0]
-        cmd_vel.linear.y = U_att[1] + U_rep[1]
-        cmd_vel.angular.z = theta
+        cmd_vel.linear.x = U_att[0]# + U_rep[0]
+        cmd_vel.linear.y = 0 #U_att[1] + U_rep[1]
+        cmd_vel.angular.z = 0 #theta
         return cmd_vel
     
         ############################################
