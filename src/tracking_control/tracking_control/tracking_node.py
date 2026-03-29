@@ -84,6 +84,10 @@ class TrackingNode(Node):
 
         # Create timer, running at 100Hz
         self.timer = self.create_timer(0.01, self.timer_update)
+
+        self.spin_start_time = self.get_clock().now()
+        self.saw_goal = False
+        self.pseudo_goal = False
     
     def detected_obs_pose_callback(self, msg):
         #self.get_logger().info('Received Detected Object Pose')
@@ -164,14 +168,22 @@ class TrackingNode(Node):
         # and update the command velocity accordingly
 
         # Thoughts:
-        # Spin in place if we don't see the goal?
-        # Start going around the obstacle?
         if self.goal_pose is None:
+            if self.saw_goal:
+                # we just saw the goal, but now we don't
+                # mark the time we started spinning to look for the goal
+                self.spin_start_time = self.get_clock().now()
+            if (self.get_clock().now() - self.spin_start_time).seconds() > 5:
+                # if we've been spinning for a while and haven't seen
+                # the goal, we can assume it's behind the obstacle
+                self.pseudo_goal = True
+            self.saw_goal = False
             cmd_vel = Twist()
-            cmd_vel.linear.x = 0.0
-            cmd_vel.angular.z = 0.0
+            cmd_vel.angular.z = 0.5
             self.pub_control_cmd.publish(cmd_vel)
             return
+        
+        self.saw_goal = True
         
         # Get the current object pose in the robot base_footprint frame
         current_obs_pose, current_goal_pose = self.get_current_poses()
