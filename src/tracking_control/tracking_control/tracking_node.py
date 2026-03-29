@@ -222,7 +222,7 @@ class TrackingNode(Node):
         # Tuning variables
         xi = 1;
         eta = 1;
-        Q_star = 10;
+        Q_star = 2;
         kturn = 0.5;
 
         # Euclidean distances to goal, obs
