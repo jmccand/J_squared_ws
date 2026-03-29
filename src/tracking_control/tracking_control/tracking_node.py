@@ -198,54 +198,57 @@ class TrackingNode(Node):
             return
 
         # Get the current object pose in the robot base_footprint frame
-        current_obs_pose, current_goal_pose = self.get_current_poses()
-        
+        result = self.get_current_poses()
+        if result is None:
+            return
+        current_obs_pose, current_goal_pose = result
+
         # TODO: get the control velocity command
-        cmd_vel = self.controller()
+        cmd_vel = self.controller(current_obs_pose, current_goal_pose)
         
         # publish the control command
         self.pub_control_cmd.publish(cmd_vel)
         #################################################
     
-    def controller(self):
+    def controller(self, obs_pose, goal_pose):
         # Instructions: You can implement your own control algorithm here
         # feel free to modify the code structure, add more parameters, more input variables for the function, etc.
-        
+
         ########### Write your code here ###########
 
         # Thoughts:
         # PID loops and Potential Fields
-        
+
         # Tuning variables
         xi = 1;
         eta = 1;
         Q_star = 0.5;
         kturn = 1;
-        
+
         # Euclidean distances to goal, obs
-        goal_dist = np.linalg.norm(self.goal_pose)
-        obs_dist = np.linalg.norm(self.obs_pose)
+        goal_dist = np.linalg.norm(goal_pose)
+        obs_dist = np.linalg.norm(obs_pose)
 
         # Attractive field
-        U_att = xi*-self.goal_pose
-        
+        U_att = xi * goal_pose
+
         # Repulsive field
         if obs_dist < Q_star:
-            U_rep = eta/2*(1/Q_star-1/obs_dist)/obs_dist**2*self.obs_pose/obs_dist
+            U_rep = eta/2*(1/Q_star-1/obs_dist)/obs_dist**2*obs_pose/obs_dist
         else:
             U_rep = np.array([0,0,0])
-        
+
         # Turn towards goal
-        theta = kturn*self.goal_pose[1]/goal_dist
+        theta = kturn*goal_pose[1]/goal_dist
 
         self.get_logger().info('U_att: {}, U_rep: {}, theta: {}'.format(U_att, U_rep, theta))
 
 
         # TODO: Update the control velocity command
         cmd_vel = Twist()
-        cmd_vel.linear.x = -U_att[0]#  - U_rep[0]
-        cmd_vel.linear.y = -U_att[1]#  - U_rep[1]
-        cmd_vel.angular.z = 0.0 # theta
+        cmd_vel.linear.x = U_att[0] + U_rep[0]
+        cmd_vel.linear.y = U_att[1] + U_rep[1]
+        cmd_vel.angular.z = theta
         return cmd_vel
     
         ############################################
