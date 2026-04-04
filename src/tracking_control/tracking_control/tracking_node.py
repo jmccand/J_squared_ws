@@ -208,7 +208,7 @@ class TrackingNode(Node):
         
         if goal_dist < 0.3:
             self.pseudo_goal = np.array([0,0,0])
-            #self.get_logger().info('Switch to goal: {}'.format(self.pseudo_goal))
+            self.get_logger().info('Switch to goal: {}'.format(self.pseudo_goal))
         
         return obstacle_pose, goal_pose
     
