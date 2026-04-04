@@ -194,6 +194,8 @@ class TrackingNode(Node):
             robot_world_R = q2R([transform.transform.rotation.w, transform.transform.rotation.x, transform.transform.rotation.y, transform.transform.rotation.z])
             obstacle_pose = robot_world_R@self.obs_pose+np.array([robot_world_x,robot_world_y,robot_world_z])
             
+            self.get_logger().info('Obs Pose: {}'.format(self.obs_pose))
+            
             # Set goal at origin once reach object goal
             if self.to_start:
                 self.goal_pose = np.array([0, 0, 0])
@@ -274,7 +276,7 @@ class TrackingNode(Node):
         # PID loops and Potential Fields
 
         # Tuning variables
-        xi = 1;
+        xi = 0.5;
         eta = 1;
         Q_star = 2;
         kturn = 0.5;
@@ -299,8 +301,7 @@ class TrackingNode(Node):
         # turn toward a weighted average of the goal and obstacle
         theta = kturn*(theta_goal*goal_dist/(goal_dist+obs_dist) + theta_obs*obs_dist/(goal_dist+obs_dist))
 
-        self.get_logger().info('U_att: {}, U_rep: {}, theta: {}'.format(U_att, U_rep, theta))
-
+        #self.get_logger().info('U_att: {}, U_rep: {}, theta: {}'.format(U_att, U_rep, theta))
 
         # TODO: Update the control velocity command
         cmd_vel = Twist()
