@@ -227,7 +227,7 @@ class TrackingNode(Node):
                 # mark spin start, spin in place
                 self.get_logger().info('No goal detected, spinning in place')
                 cmd_vel = Twist()
-                cmd_vel.angular.z = 0.5
+                cmd_vel.angular.z = 0.25
                 self.pub_control_cmd.publish(cmd_vel)
                 return
         
