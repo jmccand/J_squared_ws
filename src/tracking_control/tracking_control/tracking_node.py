@@ -85,8 +85,8 @@ class TrackingNode(Node):
     def __init__(self):
         super().__init__('tracking_node')
         self.get_logger().info('Tracking Node Started')
-        
-        self.to_start = False
+
+        self.pseudo_goal = None
         
         # Current object pose
         self.obs_filter = None
@@ -193,8 +193,8 @@ class TrackingNode(Node):
             self.get_logger().info('Obs Pose: {}'.format(self.obs_pose))
             
             # Set goal at origin once reach object goal
-            if self.to_start:
-                self.goal_pose = np.array([0, 0, 0])
+            if self.pseudo_goal is not None and self.pseudo_goal:
+                self.goal_pose = self.pseudo_goal
                 
             goal_pose = robot_world_R@self.goal_pose+np.array([robot_world_x,robot_world_y,robot_world_z])
     
@@ -207,8 +207,8 @@ class TrackingNode(Node):
         goal_dist = np.linalg.norm(goal_pose)
         
         if goal_dist < 0.3:
-            self.to_start = True
-            self.get_logger().info('Switch to goal: {}'.format(self.to_start))
+            self.pseudo_goal = np.array([0,0,0])
+            self.get_logger().info('Switch to goal: {}'.format(self.pseudo_goal))
         
         return obstacle_pose, goal_pose
     
@@ -223,27 +223,12 @@ class TrackingNode(Node):
         # log goal pose
         # self.get_logger().info('Goal Pose: {}'.format(self.goal_pose))
         if self.goal_pose is None:
-
-            # if self.saw_goal:
-            #     # we just saw the goal, but now we don't
-            #     # mark the time we started spinning to look for the goal
-            #    self.get_logger().info('No goal pose')
-            #     self.spin_start_time = self.get_clock().now()
-            # if (self.get_clock().now() - self.spin_start_time).nanoseconds > 5*1e9:
-            #     # if we've been spinning for a while and haven't seen
-            #     # the goal, we can assume it's behind the obstacle
-            #     self.pseudo_goal = True
-            # if (self.get_clock().now() - self.spin_start_time).nanoseconds > 10*1e9:
-            #     # if we've been spinning for a long time and haven't seen
-            #     # the goal, we can assume it's not there and stop
-            #     self.pseudo_goal = False
-            #     cmd_vel = Twist()
-            #     self.pub_control_cmd.publish(cmd_vel)
-            #     return
-            # self.saw_goal = False
-            # cmd_vel = Twist()
-            # cmd_vel.angular.z = 0.5
-            # self.pub_control_cmd.publish(cmd_vel)
+            if self.pseudo_goal is None:
+                # mark spin start, spin in place
+                self.get_logger().info('No goal detected, spinning in place')
+                cmd_vel = Twist()
+                cmd_vel.angular.z = 0.5
+                self.pub_control_cmd.publish(cmd_vel)
             return
         
         self.saw_goal = True
