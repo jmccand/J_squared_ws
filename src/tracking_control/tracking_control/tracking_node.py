@@ -117,7 +117,7 @@ class TrackingNode(Node):
         center_points = np.array([msg.pose.position.x, msg.pose.position.y, msg.pose.position.z])
         
         # Filtering
-        if np.linalg.norm(center_points) < 0.5 or center_points[2] > 0.7:
+        if np.linalg.norm(center_points) < 0.5 or center_points[2] > 0.3:
             return
         
         try:
@@ -151,7 +151,7 @@ class TrackingNode(Node):
         center_points = np.array([msg.pose.position.x, msg.pose.position.y, msg.pose.position.z])
         
         # Filtering
-        if np.linalg.norm(center_points) < 0.5 or center_points[2] > 0.7:
+        if np.linalg.norm(center_points) < 0.5 or center_points[2] > 0.3:
             return
         
         try:
@@ -229,13 +229,8 @@ class TrackingNode(Node):
                 cmd_vel = Twist()
                 cmd_vel.angular.z = 0.5
                 self.pub_control_cmd.publish(cmd_vel)
-            return
+                return
         
-        self.saw_goal = True
-
-        if self.obs_pose is None:
-            return
-
         # Get the current object pose in the robot base_footprint frame
         result = self.get_current_poses()
         if result is None:
