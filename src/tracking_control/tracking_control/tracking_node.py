@@ -110,10 +110,6 @@ class TrackingNode(Node):
         # Create timer, running at 100Hz
         self.timer = self.create_timer(0.01, self.timer_update)
 
-        self.spin_start_time = self.get_clock().now()
-        self.saw_goal = False
-        self.pseudo_goal = False
-    
     def detected_obs_pose_callback(self, msg):
         #self.get_logger().info('Received Detected Object Pose')
         
@@ -227,26 +223,27 @@ class TrackingNode(Node):
         # log goal pose
         # self.get_logger().info('Goal Pose: {}'.format(self.goal_pose))
         if self.goal_pose is None:
-            if self.saw_goal:
-                # we just saw the goal, but now we don't
-                # mark the time we started spinning to look for the goal
-                self.get_logger().info('No goal pose')
-                self.spin_start_time = self.get_clock().now()
-            if (self.get_clock().now() - self.spin_start_time).nanoseconds > 5*1e9:
-                # if we've been spinning for a while and haven't seen
-                # the goal, we can assume it's behind the obstacle
-                self.pseudo_goal = True
-            if (self.get_clock().now() - self.spin_start_time).nanoseconds > 10*1e9:
-                # if we've been spinning for a long time and haven't seen
-                # the goal, we can assume it's not there and stop
-                self.pseudo_goal = False
-                cmd_vel = Twist()
-                self.pub_control_cmd.publish(cmd_vel)
-                return
-            self.saw_goal = False
-            cmd_vel = Twist()
-            cmd_vel.angular.z = 0.5
-            self.pub_control_cmd.publish(cmd_vel)
+
+            # if self.saw_goal:
+            #     # we just saw the goal, but now we don't
+            #     # mark the time we started spinning to look for the goal
+            #    self.get_logger().info('No goal pose')
+            #     self.spin_start_time = self.get_clock().now()
+            # if (self.get_clock().now() - self.spin_start_time).nanoseconds > 5*1e9:
+            #     # if we've been spinning for a while and haven't seen
+            #     # the goal, we can assume it's behind the obstacle
+            #     self.pseudo_goal = True
+            # if (self.get_clock().now() - self.spin_start_time).nanoseconds > 10*1e9:
+            #     # if we've been spinning for a long time and haven't seen
+            #     # the goal, we can assume it's not there and stop
+            #     self.pseudo_goal = False
+            #     cmd_vel = Twist()
+            #     self.pub_control_cmd.publish(cmd_vel)
+            #     return
+            # self.saw_goal = False
+            # cmd_vel = Twist()
+            # cmd_vel.angular.z = 0.5
+            # self.pub_control_cmd.publish(cmd_vel)
             return
         
         self.saw_goal = True
