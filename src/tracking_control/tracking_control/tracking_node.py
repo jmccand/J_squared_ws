@@ -60,6 +60,27 @@ def euler_from_quaternion(q):
 
     return [roll,pitch,yaw]
 
+class KalmanFilter:
+    def __init__(self, mu, sigma, dt, A, B, C, R, Q):
+        self.mu = mu
+        self.sigma = sigma
+        self.dt = dt
+        self.A = A
+        self.B = B
+        self.C = C
+        self.R = R
+        self.Q = Q
+
+    def update(self, u, z):
+        mu_bar = self.A @ self.mu + self.B @ u
+        sigma_bar = self.A @ self.sigma @ self.A.T + self.R
+
+        K = sigma_bar @ self.C.T @ np.linalg.inv(self.C @ sigma_bar @ self.C.T + self.Q)
+        self.mu = mu_bar + K @ (z - self.C @ mu_bar)
+        self.sigma = (np.eye(len(self.mu)) - K @ self.C) @ sigma_bar
+        return self.mu, self.sigma
+
+
 class TrackingNode(Node):
     def __init__(self):
         super().__init__('tracking_node')
@@ -68,7 +89,9 @@ class TrackingNode(Node):
         self.to_start = False
         
         # Current object pose
+        self.obs_filter = None
         self.obs_pose = None
+        self.goal_filter = None
         self.goal_pose = None
         
         # ROS parameters
@@ -113,8 +136,20 @@ class TrackingNode(Node):
             self.get_logger().error('Transform Error: {}'.format(e))
             return
         
+
+        if self.obs_filter is None:
+            # Initialize the Kalman filter for the object pose
+            mu = cp_world
+            sigma = np.eye(3)*0.1
+            dt = 0.01
+            A = np.eye(3)
+            B = np.zeros((3, 3))
+            C = np.eye(3)
+            R = np.eye(3)
+            Q = np.eye(3)*0.1
+            self.obs_filter = KalmanFilter(mu, sigma, dt, A, B, C, R, Q)
         # Get the detected object pose in the world frame
-        self.obs_pose = cp_world
+        self.obs_pose, _ = self.obs_filter.update(np.zeros(3), cp_world)
 
     def detected_goal_pose_callback(self, msg):
         #self.get_logger().info('Received Detected Object Pose')
@@ -138,9 +173,20 @@ class TrackingNode(Node):
             self.get_logger().error('Transform Error: {}'.format(e))
             return
         
+        if self.goal_filter is None:
+            # Initialize the Kalman filter for the object pose
+            mu = cp_world
+            sigma = np.eye(3)*0.1
+            dt = 0.01
+            A = np.eye(3)
+            B = np.zeros((3, 3))
+            C = np.eye(3)
+            R = np.eye(3)
+            Q = np.eye(3)*0.1
+            self.goal_filter = KalmanFilter(mu, sigma, dt, A, B, C, R, Q)
         # Get the detected object pose in the world frame
-        self.goal_pose = cp_world
-        
+        self.goal_pose, _ = self.goal_filter.update(np.zeros(3), cp_world)
+
     def get_current_poses(self):
         
         odom_id = self.get_parameter('world_frame_id').get_parameter_value().string_value
