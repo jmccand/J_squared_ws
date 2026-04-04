@@ -190,7 +190,7 @@ class TrackingNode(Node):
             robot_world_R = q2R([transform.transform.rotation.w, transform.transform.rotation.x, transform.transform.rotation.y, transform.transform.rotation.z])
             obstacle_pose = robot_world_R@self.obs_pose+np.array([robot_world_x,robot_world_y,robot_world_z])
             
-            self.get_logger().info('Obs Pose: {}'.format(self.obs_pose))
+            #self.get_logger().info('Obs Pose: {}'.format(self.obs_pose))
             
             # Set goal at origin once reach object goal
             if self.pseudo_goal is not None and self.pseudo_goal:
@@ -208,7 +208,7 @@ class TrackingNode(Node):
         
         if goal_dist < 0.3:
             self.pseudo_goal = np.array([0,0,0])
-            self.get_logger().info('Switch to goal: {}'.format(self.pseudo_goal))
+            #self.get_logger().info('Switch to goal: {}'.format(self.pseudo_goal))
         
         return obstacle_pose, goal_pose
     
