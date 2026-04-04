@@ -65,6 +65,8 @@ class TrackingNode(Node):
         super().__init__('tracking_node')
         self.get_logger().info('Tracking Node Started')
         
+        self.to_start = False
+        
         # Current object pose
         self.obs_pose = None
         self.goal_pose = None
@@ -157,6 +159,14 @@ class TrackingNode(Node):
         except TransformException as e:
             self.get_logger().error('Transform error: ' + str(e))
             return
+        
+        goal_dist = np.linalg.norm(goal_pose)
+        
+        if goal_dist < 0.1:
+            self.to_start = True
+        
+        if self.to_start:
+            goal_pose = [0, 0, 0]
         
         return obstacle_pose, goal_pose
     
