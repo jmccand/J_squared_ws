@@ -230,6 +230,7 @@ class TrackingNode(Node):
             if self.saw_goal:
                 # we just saw the goal, but now we don't
                 # mark the time we started spinning to look for the goal
+                self.get_logger().info('No goal pose')
                 self.spin_start_time = self.get_clock().now()
             if (self.get_clock().now() - self.spin_start_time).nanoseconds > 5*1e9:
                 # if we've been spinning for a while and haven't seen
