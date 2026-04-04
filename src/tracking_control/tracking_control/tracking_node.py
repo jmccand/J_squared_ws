@@ -193,7 +193,7 @@ class TrackingNode(Node):
             #self.get_logger().info('Obs Pose: {}'.format(self.obs_pose))
             
             # Set goal at origin once reach object goal
-            if self.pseudo_goal is not None and self.pseudo_goal:
+            if self.pseudo_goal is not None:
                 self.goal_pose = self.pseudo_goal
                 
             goal_pose = robot_world_R@self.goal_pose+np.array([robot_world_x,robot_world_y,robot_world_z])
