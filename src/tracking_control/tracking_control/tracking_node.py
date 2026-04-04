@@ -277,8 +277,8 @@ class TrackingNode(Node):
 
         # Tuning variables
         xi = 0.5;
-        eta = 1;
-        Q_star = 2;
+        eta = 4;
+        Q_star = 0.5;
         kturn = 0.5;
 
         # Euclidean distances to goal, obs
