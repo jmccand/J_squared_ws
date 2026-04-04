@@ -193,6 +193,11 @@ class TrackingNode(Node):
             robot_world_z = transform.transform.translation.z
             robot_world_R = q2R([transform.transform.rotation.w, transform.transform.rotation.x, transform.transform.rotation.y, transform.transform.rotation.z])
             obstacle_pose = robot_world_R@self.obs_pose+np.array([robot_world_x,robot_world_y,robot_world_z])
+            
+            # Set goal at origin once reach object goal
+            if self.to_start:
+                self.goal_pose = np.array([0, 0, 0])
+                
             goal_pose = robot_world_R@self.goal_pose+np.array([robot_world_x,robot_world_y,robot_world_z])
     
         
@@ -200,13 +205,12 @@ class TrackingNode(Node):
             self.get_logger().error('Transform error: ' + str(e))
             return
         
+        # Raise flag to go to start once first goal reach
         goal_dist = np.linalg.norm(goal_pose)
         
-        if goal_dist < 0.1:
+        if goal_dist < 0.3:
             self.to_start = True
-        
-        if self.to_start:
-            goal_pose = [0, 0, 0]
+            self.get_logger().info('Switch to goal: {}'.format(self.to_start))
         
         return obstacle_pose, goal_pose
     
